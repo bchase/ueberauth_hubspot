@@ -17,8 +17,6 @@ defmodule Ueberauth.Strategy.Asana do
 
     opts =
       [scope: scopes]
-      # |> with_optional_param_or_default(:prompt, conn)
-      # |> with_optional_param_or_default(:permissions, conn)
       |> with_state_param(conn)
       |> Keyword.put(:redirect_uri, callback_url(conn))
 
@@ -37,7 +35,6 @@ defmodule Ueberauth.Strategy.Asana do
     else
       conn
       |> store_token(token)
-      |> fetch_user(token)
     end
   end
 
@@ -50,30 +47,12 @@ defmodule Ueberauth.Strategy.Asana do
   def handle_cleanup!(conn) do
     conn
     |> put_private(:asana_token, nil)
-    |> put_private(:asana_user, nil)
   end
 
   # Store the token for later use.
   @doc false
   defp store_token(conn, token) do
     put_private(conn, :asana_token, token)
-  end
-
-  defp fetch_user(conn, token) do
-    path = "https://asana.com/api/users/@me"
-    resp = Ueberauth.Strategy.Asana.OAuth.get(token, path)
-
-    case resp do
-      {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
-        set_errors!(conn, [error("token", "unauthorized")])
-
-      {:ok, %OAuth2.Response{status_code: status_code, body: user}}
-      when status_code in 200..399 ->
-        put_private(conn, :asana_user, user)
-
-      {:error, %OAuth2.Error{reason: reason}} ->
-        set_errors!(conn, [error("OAuth2", reason)])
-    end
   end
 
   defp split_scopes(token) do
@@ -101,21 +80,12 @@ defmodule Ueberauth.Strategy.Asana do
   Fetches the fields to populate the info section of the `Ueberauth.Auth` struct.
   """
   def info(conn) do
-    user = conn.private.asana_user
+    token = conn.private.asana_token
 
     %Info{
-      email: user["email"],
-      image: fetch_image(user),
-      nickname: user["username"]
+      name: get_data(token, "name"),
+      email: get_data(token, "email"),
     }
-  end
-
-  defp fetch_image(user) do
-    if user["avatar"] do
-      "https://cdn.asanaapp.com/avatars/#{user["id"]}/#{user["avatar"]}.jpg"
-    else
-      "https://cdn.asanaapp.com/embed/avatars/#{Integer.mod(String.to_integer(user["discriminator"]), 5)}.png"
-    end
   end
 
   @doc """
@@ -125,7 +95,6 @@ defmodule Ueberauth.Strategy.Asana do
   def extra(conn) do
     %{
       asana_token: :token,
-      asana_user: :user,
     }
     |> Enum.filter(fn {original_key, _} ->
       Map.has_key?(conn.private, original_key)
@@ -146,23 +115,14 @@ defmodule Ueberauth.Strategy.Asana do
       |> option(:uid_field)
       |> to_string
 
-    conn.private.asana_user[uid_field]
+    get_data(conn.private.asana_token, uid_field)
   end
 
   defp option(conn, key) do
     Keyword.get(options(conn), key, Keyword.get(default_options(), key))
   end
 
-  # defp with_optional_param_or_default(opts, key, conn) do
-  #   cond do
-  #     value = conn.params[to_string(key)] ->
-  #       Keyword.put(opts, key, value)
-
-  #     default_opt = option(conn, key) ->
-  #       Keyword.put(opts, key, default_opt)
-
-  #     true ->
-  #       opts
-  #   end
-  # end
+  defp get_data(token, field) do
+    token.other_params["data"][field]
+  end
 end
