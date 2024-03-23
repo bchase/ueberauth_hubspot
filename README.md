@@ -1,6 +1,8 @@
 # Überauth Asana
 
-> Asana OAuth2 strategy for Überauth.
+Asana OAuth2 strategy for Überauth
+
+**NOTE**: only a slightly modified fork of [`schwarz/ueberauth_discord`](https://github.com/schwarz/ueberauth_discord)
 
 ## Installation
 
