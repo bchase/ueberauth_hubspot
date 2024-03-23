@@ -13,7 +13,7 @@ defmodule Ueberauth.Strategy.Asana.OAuth do
 
   @defaults [
     strategy: __MODULE__,
-    site: "https://app.asana.com",
+    site: "https://app.asana.com/api/1.0",
     authorize_url: "https://app.asana.com/-/oauth_authorize",
     token_url: "https://app.asana.com/-/oauth_token"
   ]
