@@ -1,38 +1,34 @@
-# Überauth Discord
+# Überauth Asana
 
-[![Hex pm](https://img.shields.io/hexpm/v/ueberauth_discord.svg?style=flat)](https://hex.pm/packages/ueberauth_discord) [![Hexdocs.pm](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/ueberauth_discord/)
-
-> Discord OAuth2 strategy for Überauth.
-
-For additional documentation on Discord's OAuth implementation see [discord-oauth2-example](https://github.com/hammerandchisel/discord-oauth2-example).
+> Asana OAuth2 strategy for Überauth.
 
 ## Installation
 
-1. Setup your application at [Discord Developers](https://discord.com/developers/applications/me).
+1. Setup your application at [Asana Developers](https://developers.asana.com/docs/oauth).
 
-1. Add `:ueberauth_discord` to your list of dependencies in `mix.exs`:
+1. Add `:ueberauth_asana` to your list of dependencies in `mix.exs`:
 
     ```elixir
     def deps do
-      [{:ueberauth_discord, "~> 0.6"}]
+      [{:ueberauth_asana, "~> 0.1"}]
     end
     ```
 
-1. Add Discord to your Überauth configuration:
+1. Add Asana to your Überauth configuration:
 
     ```elixir
     config :ueberauth, Ueberauth,
       providers: [
-        discord: {Ueberauth.Strategy.Discord, []}
+        asana: {Ueberauth.Strategy.Asana, []}
       ]
     ```
 
 1.  Update your provider configuration:
 
     ```elixir
-    config :ueberauth, Ueberauth.Strategy.Discord.OAuth,
-      client_id: System.get_env("DISCORD_CLIENT_ID"),
-      client_secret: System.get_env("DISCORD_CLIENT_SECRET")
+    config :ueberauth, Ueberauth.Strategy.Asana.OAuth,
+      client_id: System.get_env("ASANA_CLIENT_ID"),
+      client_secret: System.get_env("ASANA_CLIENT_SECRET")
     ```
 
 1.  Include the Überauth plug in your controller:
@@ -56,7 +52,7 @@ For additional documentation on Discord's OAuth implementation see [discord-oaut
     end
     ```
 
-    And make sure to set the correct redirect URI(s) in your Discord application to wire up the callback.
+    And make sure to set the correct redirect URI(s) in your Asana application to wire up the callback.
 
 1. Your controller needs to implement callbacks to deal with `Ueberauth.Auth` and `Ueberauth.Failure` responses.
 
@@ -68,61 +64,18 @@ For an example implementation see the [Überauth Example](https://github.com/ueb
 
 Depending on the configured url you can initialize the request through:
 
-    /auth/discord
+    /auth/asana
 
 Or with options:
 
-    /auth/discord?scope=identify%20email&prompt=none&permissions=452987952
+    /auth/asana?scope=openid%20email
 
-By default the requested scope is "identify". Scope can be configured either explicitly as a `scope` query value on the request path or in your configuration:
-
-```elixir
-config :ueberauth, Ueberauth,
-  providers: [
-    discord: {Ueberauth.Strategy.Discord, [default_scope: "identify email connections guilds"]}
-  ]
-```
-
-You can also specify the `prompt` and `permissions` params to pass to Discord:
+By default the requested scope is "default". Scope can be configured either explicitly as a `scope` query value on the request path or in your configuration:
 
 ```elixir
 config :ueberauth, Ueberauth,
   providers: [
-    discord: {Ueberauth.Strategy.Discord, [
-      default_scope: "identify email connections guilds",
-      prompt: "none",
-      permissions: 452987952
-    ]}
+    asana: {Ueberauth.Strategy.Asana, [default_scope: "default"]}
+    # asana: {Ueberauth.Strategy.Asana, [default_scope: "default openid email profile"]}
   ]
 ```
-
-### Bot
-
-This library can also be used to add bots to guilds. 
-
-When adding bots, the `scope` should be set to `bot` and `permissions` should be set so your bot can perform actions in the host guild.
-
-You can use the following parameters in addition to the ones specified for the user auth flow:
-- `guild_id` - pre-select the guild to which the bot will be added
-- `disable_guild_select` - disable the dropdown to select a guild (can improve UX by limiting choices)
-
-Usage would look like the following:
-```elixir
-your_link_building_method(
-  :request,
-  "discord",
-  scope: "bot",
-  guild_id: guild_id,
-  disable_guild_select: true,
-  permissions: my_default_bot_permissions()
-)
-```
-
-This should produce a link with the following format: 
-```bash
-https://discord.com/oauth2/authorize?client_id=<YOUR_CLIENT_ID>&disable_guild_select=true&guild_id=<SOME_GUILD_ID>&permissions=<DEFAULT_BOT_PERMISSIONS>&redirect_uri=<YOUR_DISCORD_CALLBACK_URI>&response_type=code&scope=bot&state=ebla7tFnIyX_FdmY5wjW8u7NJkc
-```
-
-## License
-
-Please see [LICENSE](https://github.com/schwarz/ueberauth_discord/blob/master/LICENSE) for licensing details.

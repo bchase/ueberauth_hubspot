@@ -1,15 +1,15 @@
-defmodule UeberauthDiscord.Mixfile do
+defmodule UeberauthAsana.Mixfile do
   use Mix.Project
 
-  @version "0.7.0"
-  @url "https://github.com/schwarz/ueberauth_discord"
+  @version "0.1.0"
+  @url "https://github.com/bchase/ueberauth_asana"
 
   def project do
     [
-      app: :ueberauth_discord,
+      app: :ueberauth_asana,
       version: @version,
       elixir: "~> 1.3",
-      name: "Ueberauth Discord",
+      name: "Ueberauth Asana",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       source_url: @url,
@@ -39,13 +39,13 @@ defmodule UeberauthDiscord.Mixfile do
   end
 
   defp description do
-    "An Uberauth strategy for Discord authentication."
+    "An Uberauth strategy for Asana authentication."
   end
 
   defp package do
     [
       files: ["lib", "mix.exs", "README.md", "LICENSE"],
-      maintainers: ["Bernhard Schwarz"],
+      maintainers: ["Brad Chase"],
       licenses: ["MIT"],
       links: %{GitHub: @url}
     ]

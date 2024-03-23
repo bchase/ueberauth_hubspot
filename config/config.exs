@@ -10,11 +10,11 @@ import Config
 
 # You can configure for your application as:
 #
-#     config :ueberauth_discord, key: :value
+#     config :ueberauth_asana, key: :value
 #
 # And access this configuration in your application as:
 #
-#     Application.get_env(:ueberauth_discord, :key)
+#     Application.get_env(:ueberauth_asana, :key)
 #
 # Or configure a 3rd-party app:
 #

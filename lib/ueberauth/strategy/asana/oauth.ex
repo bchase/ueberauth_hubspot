@@ -1,12 +1,12 @@
-defmodule Ueberauth.Strategy.Discord.OAuth do
+defmodule Ueberauth.Strategy.Asana.OAuth do
   @moduledoc """
-  OAuth2 for Discord.
+  OAuth2 for Asana.
 
   Add `client_id` and `client_secret` to your configuration:
 
-  config :ueberauth, Ueberauth.Strategy.Discord.OAuth,
-    client_id: System.get_env("DISCORD_CLIENT_ID"),
-    client_secret: System.get_env("DISCORD_CLIENT_SECRET")
+  config :ueberauth, Ueberauth.Strategy.Asana.OAuth,
+    client_id: System.get_env("ASANA_CLIENT_ID"),
+    client_secret: System.get_env("ASANA_CLIENT_SECRET")
   """
 
   use OAuth2.Strategy
@@ -20,13 +20,13 @@ defmodule Ueberauth.Strategy.Discord.OAuth do
 
 
   @doc """
-  Construct a client for requests to Discord.
-  This will be setup automatically for you in `Ueberauth.Strategy.Discord`.
+  Construct a client for requests to Asana.
+  This will be setup automatically for you in `Ueberauth.Strategy.Asana`.
   These options are only useful for usage outside the normal callback phase
   of Ueberauth.
   """
   def client(opts \\ []) do
-    config = Application.get_env(:ueberauth, Ueberauth.Strategy.Discord.OAuth)
+    config = Application.get_env(:ueberauth, Ueberauth.Strategy.Asana.OAuth)
 
     opts =
       @defaults

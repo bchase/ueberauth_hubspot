@@ -1,6 +1,6 @@
-defmodule Ueberauth.Strategy.Discord do
+defmodule Ueberauth.Strategy.Asana do
   @moduledoc """
-  Discord Strategy for Überauth.
+  Asana Strategy for Überauth.
   """
 
   use Ueberauth.Strategy, uid_field: :id, default_scope: "default"
@@ -10,7 +10,7 @@ defmodule Ueberauth.Strategy.Discord do
   alias Ueberauth.Auth.Extra
 
   @doc """
-  Handles initial request for Discord authentication.
+  Handles initial request for Asana authentication.
   """
   def handle_request!(conn) do
     scopes = conn.params["scope"] || option(conn, :default_scope)
@@ -22,13 +22,13 @@ defmodule Ueberauth.Strategy.Discord do
       |> with_state_param(conn)
       |> Keyword.put(:redirect_uri, callback_url(conn))
 
-    redirect!(conn, Ueberauth.Strategy.Discord.OAuth.authorize_url!(opts))
+    redirect!(conn, Ueberauth.Strategy.Asana.OAuth.authorize_url!(opts))
   end
 
   @doc false
   def handle_callback!(%Plug.Conn{params: %{"code" => code}} = conn) do
     opts = [redirect_uri: callback_url(conn)]
-    token = Ueberauth.Strategy.Discord.OAuth.get_token!([code: code], opts)
+    token = Ueberauth.Strategy.Asana.OAuth.get_token!([code: code], opts)
 
     if token.access_token == nil do
       err = token.other_params["error"]
@@ -49,19 +49,19 @@ defmodule Ueberauth.Strategy.Discord do
   @doc false
   def handle_cleanup!(conn) do
     conn
-    |> put_private(:discord_token, nil)
-    |> put_private(:discord_user, nil)
+    |> put_private(:asana_token, nil)
+    |> put_private(:asana_user, nil)
   end
 
   # Store the token for later use.
   @doc false
   defp store_token(conn, token) do
-    put_private(conn, :discord_token, token)
+    put_private(conn, :asana_token, token)
   end
 
   defp fetch_user(conn, token) do
-    path = "https://discord.com/api/users/@me"
-    resp = Ueberauth.Strategy.Discord.OAuth.get(token, path)
+    path = "https://asana.com/api/users/@me"
+    resp = Ueberauth.Strategy.Asana.OAuth.get(token, path)
 
     case resp do
       {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
@@ -69,7 +69,7 @@ defmodule Ueberauth.Strategy.Discord do
 
       {:ok, %OAuth2.Response{status_code: status_code, body: user}}
       when status_code in 200..399 ->
-        put_private(conn, :discord_user, user)
+        put_private(conn, :asana_user, user)
 
       {:error, %OAuth2.Error{reason: reason}} ->
         set_errors!(conn, [error("OAuth2", reason)])
@@ -82,10 +82,10 @@ defmodule Ueberauth.Strategy.Discord do
   end
 
   @doc """
-  Includes the credentials from the Discord response.
+  Includes the credentials from the Asana response.
   """
   def credentials(conn) do
-    token = conn.private.discord_token
+    token = conn.private.asana_token
     scopes = split_scopes(token)
 
     %Credentials{
@@ -101,7 +101,7 @@ defmodule Ueberauth.Strategy.Discord do
   Fetches the fields to populate the info section of the `Ueberauth.Auth` struct.
   """
   def info(conn) do
-    user = conn.private.discord_user
+    user = conn.private.asana_user
 
     %Info{
       email: user["email"],
@@ -112,20 +112,20 @@ defmodule Ueberauth.Strategy.Discord do
 
   defp fetch_image(user) do
     if user["avatar"] do
-      "https://cdn.discordapp.com/avatars/#{user["id"]}/#{user["avatar"]}.jpg"
+      "https://cdn.asanaapp.com/avatars/#{user["id"]}/#{user["avatar"]}.jpg"
     else
-      "https://cdn.discordapp.com/embed/avatars/#{Integer.mod(String.to_integer(user["discriminator"]), 5)}.png"
+      "https://cdn.asanaapp.com/embed/avatars/#{Integer.mod(String.to_integer(user["discriminator"]), 5)}.png"
     end
   end
 
   @doc """
   Stores the raw information (including the token & user)
-  obtained from the Discord callback.
+  obtained from the Asana callback.
   """
   def extra(conn) do
     %{
-      discord_token: :token,
-      discord_user: :user,
+      asana_token: :token,
+      asana_user: :user,
     }
     |> Enum.filter(fn {original_key, _} ->
       Map.has_key?(conn.private, original_key)
@@ -146,7 +146,7 @@ defmodule Ueberauth.Strategy.Discord do
       |> option(:uid_field)
       |> to_string
 
-    conn.private.discord_user[uid_field]
+    conn.private.asana_user[uid_field]
   end
 
   defp option(conn, key) do
