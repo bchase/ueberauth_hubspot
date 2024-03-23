@@ -3,7 +3,7 @@ defmodule Ueberauth.Strategy.Discord do
   Discord Strategy for Überauth.
   """
 
-  use Ueberauth.Strategy, uid_field: :id, default_scope: "identify"
+  use Ueberauth.Strategy, uid_field: :id, default_scope: "default"
 
   alias Ueberauth.Auth.Info
   alias Ueberauth.Auth.Credentials
@@ -17,10 +17,8 @@ defmodule Ueberauth.Strategy.Discord do
 
     opts =
       [scope: scopes]
-      |> with_optional_param_or_default(:prompt, conn)
-      |> with_optional_param_or_default(:permissions, conn)
-      |> with_optional_param_or_default(:guild_id, conn)
-      |> with_optional_param_or_default(:disable_guild_select, conn)
+      # |> with_optional_param_or_default(:prompt, conn)
+      # |> with_optional_param_or_default(:permissions, conn)
       |> with_state_param(conn)
       |> Keyword.put(:redirect_uri, callback_url(conn))
 
@@ -40,8 +38,6 @@ defmodule Ueberauth.Strategy.Discord do
       conn
       |> store_token(token)
       |> fetch_user(token)
-      |> fetch_connections(token)
-      |> fetch_guilds(token)
     end
   end
 
@@ -55,8 +51,6 @@ defmodule Ueberauth.Strategy.Discord do
     conn
     |> put_private(:discord_token, nil)
     |> put_private(:discord_user, nil)
-    |> put_private(:discord_connections, nil)
-    |> put_private(:discord_guilds, nil)
   end
 
   # Store the token for later use.
@@ -85,58 +79,6 @@ defmodule Ueberauth.Strategy.Discord do
   defp split_scopes(token) do
     (token.other_params["scope"] || "")
     |> String.split(" ")
-  end
-
-  defp fetch_connections(%Plug.Conn{assigns: %{ueberauth_failure: _fails}} = conn, _), do: conn
-
-  defp fetch_connections(conn, token) do
-    scopes = split_scopes(token)
-
-    case "connections" in scopes do
-      false ->
-        conn
-
-      true ->
-        path = "https://discord.com/api/users/@me/connections"
-
-        case Ueberauth.Strategy.Discord.OAuth.get(token, path) do
-          {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
-            set_errors!(conn, [error("token", "unauthorized")])
-
-          {:ok, %OAuth2.Response{status_code: status_code, body: connections}}
-          when status_code in 200..399 ->
-            put_private(conn, :discord_connections, connections)
-
-          {:error, %OAuth2.Error{reason: reason}} ->
-            set_errors!(conn, [error("OAuth2", reason)])
-        end
-    end
-  end
-
-  defp fetch_guilds(%Plug.Conn{assigns: %{ueberauth_failure: _fails}} = conn, _), do: conn
-
-  defp fetch_guilds(conn, token) do
-    scopes = split_scopes(token)
-
-    case "guilds" in scopes do
-      false ->
-        conn
-
-      true ->
-        path = "https://discord.com/api/users/@me/guilds"
-
-        case Ueberauth.Strategy.Discord.OAuth.get(token, path) do
-          {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
-            set_errors!(conn, [error("token", "unauthorized")])
-
-          {:ok, %OAuth2.Response{status_code: status_code, body: guilds}}
-          when status_code in 200..399 ->
-            put_private(conn, :discord_guilds, guilds)
-
-          {:error, %OAuth2.Error{reason: reason}} ->
-            set_errors!(conn, [error("OAuth2", reason)])
-        end
-    end
   end
 
   @doc """
@@ -177,15 +119,13 @@ defmodule Ueberauth.Strategy.Discord do
   end
 
   @doc """
-  Stores the raw information (including the token, user, connections and guilds)
+  Stores the raw information (including the token & user)
   obtained from the Discord callback.
   """
   def extra(conn) do
     %{
       discord_token: :token,
       discord_user: :user,
-      discord_connections: :connections,
-      discord_guilds: :guilds
     }
     |> Enum.filter(fn {original_key, _} ->
       Map.has_key?(conn.private, original_key)
@@ -213,16 +153,16 @@ defmodule Ueberauth.Strategy.Discord do
     Keyword.get(options(conn), key, Keyword.get(default_options(), key))
   end
 
-  defp with_optional_param_or_default(opts, key, conn) do
-    cond do
-      value = conn.params[to_string(key)] ->
-        Keyword.put(opts, key, value)
+  # defp with_optional_param_or_default(opts, key, conn) do
+  #   cond do
+  #     value = conn.params[to_string(key)] ->
+  #       Keyword.put(opts, key, value)
 
-      default_opt = option(conn, key) ->
-        Keyword.put(opts, key, default_opt)
+  #     default_opt = option(conn, key) ->
+  #       Keyword.put(opts, key, default_opt)
 
-      true ->
-        opts
-    end
-  end
+  #     true ->
+  #       opts
+  #   end
+  # end
 end

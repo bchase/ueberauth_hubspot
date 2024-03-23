@@ -13,9 +13,9 @@ defmodule Ueberauth.Strategy.Discord.OAuth do
 
   @defaults [
     strategy: __MODULE__,
-    site: "https://discord.com/api",
-    authorize_url: "https://discord.com/api/oauth2/authorize",
-    token_url: "https://discord.com/api/oauth2/token"
+    site: "https://app.asana.com",
+    authorize_url: "https://app.asana.com/-/oauth_authorize",
+    token_url: "https://app.asana.com/-/oauth_token"
   ]
 
 
