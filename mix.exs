@@ -22,14 +22,18 @@ defmodule UeberauthAsana.Mixfile do
   end
 
   def application do
-    [applications: [:logger, :oauth2, :ueberauth]]
+    [applications: [:logger, :oauth2, :ueberauth] ++ env_apps(Mix.env())]
   end
+
+  defp env_apps(:dev), do: [:makeup, :makeup_elixir, :makeup_erlang, :ex_doc]
+  defp env_apps(_), do: []
 
   defp deps do
     [
       {:ueberauth, "~> 0.7"},
       {:oauth2, "~> 1.0 or ~> 2.0"},
-      {:ex_doc, "~> 0.27", only: :dev},
+
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:earmark, ">= 0.0.0", only: :dev}
     ]
   end
