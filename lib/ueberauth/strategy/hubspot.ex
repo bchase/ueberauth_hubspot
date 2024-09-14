@@ -13,7 +13,7 @@ defmodule Ueberauth.Strategy.Hubspot do
   Handles initial request for HubSpot authentication.
   """
   def handle_request!(conn) do
-    scopes = conn.params["scope"] || option(conn, :default_scope)
+    scopes = build_scopes(conn)
 
     opts =
       [scope: scopes]
@@ -21,6 +21,20 @@ defmodule Ueberauth.Strategy.Hubspot do
       |> Keyword.put(:redirect_uri, callback_url(conn))
 
     redirect!(conn, Ueberauth.Strategy.Hubspot.OAuth.authorize_url!(opts))
+  end
+
+  defp build_scopes(conn) do
+    conn.params["scope"] || app_env(:default_scope) || option(conn, :default_scope)
+  end
+
+  defp app_env(key) do
+    case Application.get_env(:ueberauth, __MODULE__) do
+      nil ->
+        nil
+
+      env ->
+        env[key]
+    end
   end
 
   @doc false
