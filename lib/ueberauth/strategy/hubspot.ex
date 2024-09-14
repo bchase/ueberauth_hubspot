@@ -1,6 +1,6 @@
-defmodule Ueberauth.Strategy.Asana do
+defmodule Ueberauth.Strategy.Hubspot do
   @moduledoc """
-  Asana Strategy for Überauth.
+  HubSpot Strategy for Überauth.
   """
 
   use Ueberauth.Strategy, uid_field: :id, default_scope: "default"
@@ -10,7 +10,7 @@ defmodule Ueberauth.Strategy.Asana do
   alias Ueberauth.Auth.Extra
 
   @doc """
-  Handles initial request for Asana authentication.
+  Handles initial request for HubSpot authentication.
   """
   def handle_request!(conn) do
     scopes = conn.params["scope"] || option(conn, :default_scope)
@@ -20,13 +20,13 @@ defmodule Ueberauth.Strategy.Asana do
       |> with_state_param(conn)
       |> Keyword.put(:redirect_uri, callback_url(conn))
 
-    redirect!(conn, Ueberauth.Strategy.Asana.OAuth.authorize_url!(opts))
+    redirect!(conn, Ueberauth.Strategy.Hubspot.OAuth.authorize_url!(opts))
   end
 
   @doc false
   def handle_callback!(%Plug.Conn{params: %{"code" => code}} = conn) do
     opts = [redirect_uri: callback_url(conn)]
-    token = Ueberauth.Strategy.Asana.OAuth.get_token!([code: code], opts)
+    token = Ueberauth.Strategy.Hubspot.OAuth.get_token!([code: code], opts)
 
     if token.access_token == nil do
       err = token.other_params["error"]
@@ -46,13 +46,13 @@ defmodule Ueberauth.Strategy.Asana do
   @doc false
   def handle_cleanup!(conn) do
     conn
-    |> put_private(:asana_token, nil)
+    |> put_private(:hubspot_token, nil)
   end
 
   # Store the token for later use.
   @doc false
   defp store_token(conn, token) do
-    put_private(conn, :asana_token, token)
+    put_private(conn, :hubspot_token, token)
   end
 
   defp split_scopes(token) do
@@ -61,10 +61,10 @@ defmodule Ueberauth.Strategy.Asana do
   end
 
   @doc """
-  Includes the credentials from the Asana response.
+  Includes the credentials from the HubSpot response.
   """
   def credentials(conn) do
-    token = conn.private.asana_token
+    token = conn.private.hubspot_token
     scopes = split_scopes(token)
 
     %Credentials{
@@ -80,7 +80,7 @@ defmodule Ueberauth.Strategy.Asana do
   Fetches the fields to populate the info section of the `Ueberauth.Auth` struct.
   """
   def info(conn) do
-    token = conn.private.asana_token
+    token = conn.private.hubspot_token
 
     %Info{
       name: get_data(token, "name"),
@@ -90,11 +90,11 @@ defmodule Ueberauth.Strategy.Asana do
 
   @doc """
   Stores the raw information (including the token & user)
-  obtained from the Asana callback.
+  obtained from the HubSpot callback.
   """
   def extra(conn) do
     %{
-      asana_token: :token,
+      hubspot_token: :token,
     }
     |> Enum.filter(fn {original_key, _} ->
       Map.has_key?(conn.private, original_key)
@@ -115,7 +115,7 @@ defmodule Ueberauth.Strategy.Asana do
       |> option(:uid_field)
       |> to_string
 
-    get_data(conn.private.asana_token, uid_field)
+    get_data(conn.private.hubspot_token, uid_field)
   end
 
   defp option(conn, key) do

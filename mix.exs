@@ -1,15 +1,15 @@
-defmodule UeberauthAsana.Mixfile do
+defmodule UeberauthHubspot.Mixfile do
   use Mix.Project
 
   @version "0.1.0"
-  @url "https://github.com/bchase/ueberauth_asana"
+  @url "https://github.com/bchase/ueberauth_hubspot"
 
   def project do
     [
-      app: :ueberauth_asana,
+      app: :ueberauth_hubspot,
       version: @version,
       elixir: "~> 1.3",
-      name: "Ueberauth Asana",
+      name: "Ueberauth HubSpot",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       source_url: @url,
@@ -43,7 +43,7 @@ defmodule UeberauthAsana.Mixfile do
   end
 
   defp description do
-    "An Uberauth strategy for Asana authentication."
+    "An Uberauth strategy for HubSpot authentication."
   end
 
   defp package do

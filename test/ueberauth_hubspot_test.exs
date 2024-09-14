@@ -1,6 +1,6 @@
-defmodule UeberauthAsanaTest do
+defmodule UeberauthHubspotTest do
   use ExUnit.Case
-  doctest UeberauthAsana
+  doctest UeberauthHubspot
 
   test "the truth" do
     assert 1 + 1 == 2

@@ -10,11 +10,11 @@ import Config
 
 # You can configure for your application as:
 #
-#     config :ueberauth_asana, key: :value
+#     config :ueberauth_hubspot, key: :value
 #
 # And access this configuration in your application as:
 #
-#     Application.get_env(:ueberauth_asana, :key)
+#     Application.get_env(:ueberauth_hubspot, :key)
 #
 # Or configure a 3rd-party app:
 #

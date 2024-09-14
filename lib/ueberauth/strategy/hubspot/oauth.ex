@@ -1,32 +1,32 @@
-defmodule Ueberauth.Strategy.Asana.OAuth do
+defmodule Ueberauth.Strategy.Hubspot.OAuth do
   @moduledoc """
-  OAuth2 for Asana.
+  OAuth2 for HubSpot.
 
   Add `client_id` and `client_secret` to your configuration:
 
-  config :ueberauth, Ueberauth.Strategy.Asana.OAuth,
-    client_id: System.get_env("ASANA_CLIENT_ID"),
-    client_secret: System.get_env("ASANA_CLIENT_SECRET")
+  config :ueberauth, Ueberauth.Strategy.Hubspot.OAuth,
+    client_id: System.get_env("HUBSPOT_CLIENT_ID"),
+    client_secret: System.get_env("HUBSPOT_CLIENT_SECRET")
   """
 
   use OAuth2.Strategy
 
   @defaults [
     strategy: __MODULE__,
-    site: "https://app.asana.com/api/1.0",
-    authorize_url: "https://app.asana.com/-/oauth_authorize",
-    token_url: "https://app.asana.com/-/oauth_token"
+    site: "https://app.hubspot.com/api/1.0",
+    authorize_url: "https://app.hubspot.com/-/oauth_authorize",
+    token_url: "https://app.hubspot.com/-/oauth_token"
   ]
 
 
   @doc """
-  Construct a client for requests to Asana.
-  This will be setup automatically for you in `Ueberauth.Strategy.Asana`.
+  Construct a client for requests to HubSpot.
+  This will be setup automatically for you in `Ueberauth.Strategy.Hubspot`.
   These options are only useful for usage outside the normal callback phase
   of Ueberauth.
   """
   def client(opts \\ []) do
-    config = Application.get_env(:ueberauth, Ueberauth.Strategy.Asana.OAuth)
+    config = Application.get_env(:ueberauth, Ueberauth.Strategy.Hubspot.OAuth)
 
     opts =
       @defaults

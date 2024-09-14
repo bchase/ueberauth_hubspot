@@ -1,36 +1,36 @@
-# Überauth Asana
+# Überauth HubSpot
 
-Asana OAuth2 strategy for Überauth
+HubSpot OAuth2 strategy for Überauth
 
 **NOTE**: only a slightly modified fork of [`schwarz/ueberauth_discord`](https://github.com/schwarz/ueberauth_discord)
 
 ## Installation
 
-1. Setup your application at [Asana Developers](https://developers.asana.com/docs/oauth).
+1. Setup your application at [HubSpot Developers](https://developers.hubspot.com/docs/api/working-with-oauth).
 
-1. Add `:ueberauth_asana` to your list of dependencies in `mix.exs`:
+1. Add `:ueberauth_hubspot` to your list of dependencies in `mix.exs`:
 
     ```elixir
     def deps do
-      [{:ueberauth_asana, "~> 0.1"}]
+      [{:ueberauth_hubspot, "~> 0.1"}]
     end
     ```
 
-1. Add Asana to your Überauth configuration:
+1. Add HubSpot to your Überauth configuration:
 
     ```elixir
     config :ueberauth, Ueberauth,
       providers: [
-        asana: {Ueberauth.Strategy.Asana, []}
+        hubspot: {Ueberauth.Strategy.Hubspot, []}
       ]
     ```
 
 1.  Update your provider configuration:
 
     ```elixir
-    config :ueberauth, Ueberauth.Strategy.Asana.OAuth,
-      client_id: System.get_env("ASANA_CLIENT_ID"),
-      client_secret: System.get_env("ASANA_CLIENT_SECRET")
+    config :ueberauth, Ueberauth.Strategy.Hubspot.OAuth,
+      client_id: System.get_env("HUBSPOT_CLIENT_ID"),
+      client_secret: System.get_env("HUBSPOT_CLIENT_SECRET")
     ```
 
 1.  Include the Überauth plug in your controller:
@@ -54,7 +54,7 @@ Asana OAuth2 strategy for Überauth
     end
     ```
 
-    And make sure to set the correct redirect URI(s) in your Asana application to wire up the callback.
+    And make sure to set the correct redirect URI(s) in your HubSpot application to wire up the callback.
 
 1. Your controller needs to implement callbacks to deal with `Ueberauth.Auth` and `Ueberauth.Failure` responses.
 
@@ -66,18 +66,18 @@ For an example implementation see the [Überauth Example](https://github.com/ueb
 
 Depending on the configured url you can initialize the request through:
 
-    /auth/asana
+    /auth/hubspot
 
 Or with options:
 
-    /auth/asana?scope=openid%20email
+    /auth/hubspot?scope=openid%20email
 
 By default the requested scope is "default". Scope can be configured either explicitly as a `scope` query value on the request path or in your configuration:
 
 ```elixir
 config :ueberauth, Ueberauth,
   providers: [
-    asana: {Ueberauth.Strategy.Asana, [default_scope: "default"]}
-    # asana: {Ueberauth.Strategy.Asana, [default_scope: "default openid email profile"]}
+    hubspot: {Ueberauth.Strategy.Hubspot, [default_scope: "default"]}
+    # hubspot: {Ueberauth.Strategy.Hubspot, [default_scope: "default openid email profile"]}
   ]
 ```
