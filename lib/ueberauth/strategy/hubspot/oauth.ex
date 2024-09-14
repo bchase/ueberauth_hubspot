@@ -13,9 +13,9 @@ defmodule Ueberauth.Strategy.Hubspot.OAuth do
 
   @defaults [
     strategy: __MODULE__,
-    site: "https://app.hubspot.com/api/1.0",
-    authorize_url: "https://app.hubspot.com/-/oauth_authorize",
-    token_url: "https://app.hubspot.com/-/oauth_token"
+    site: "https://api.hubapi.com/crm/v3",
+    authorize_url: "https://app.hubspot.com/oauth/authorize",
+    token_url: "https://api.hubapi.com/oauth/v1/token"
   ]
 
 
