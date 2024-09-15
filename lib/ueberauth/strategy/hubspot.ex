@@ -3,7 +3,7 @@ defmodule Ueberauth.Strategy.Hubspot do
   HubSpot Strategy for Überauth.
   """
 
-  use Ueberauth.Strategy, uid_field: :id, default_scope: "default"
+  use Ueberauth.Strategy, uid_field: :id, default_scope: "oauth"
 
   alias Ueberauth.Auth.Info
   alias Ueberauth.Auth.Credentials
@@ -28,7 +28,7 @@ defmodule Ueberauth.Strategy.Hubspot do
   end
 
   defp app_env(key) do
-    case Application.get_env(:ueberauth, __MODULE__) do
+    case Application.get_env(:ueberauth, __MODULE__.OAuth) do
       nil ->
         nil
 
